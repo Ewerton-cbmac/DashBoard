@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +12,16 @@
             margin: 0;
             padding: 20px;
         }
+
         h1 {
             text-align: center;
             color: #333;
         }
+
         .status-section {
             margin-bottom: 20px;
         }
+
         .status-title {
             font-size: 20px;
             font-weight: bold;
@@ -27,124 +31,161 @@
             margin-bottom: 10px;
             text-align: center;
         }
-        .status-em-base { background: #28a745; color: white; }
-        .status-em-deslocamento { background: #ffc107; color: black; }
-        .status-em-acao { background: #dc3545; color: white; }
-        .status-outros { background: #6c757d; color: white; }
+
+        .status-livre {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-empenhada {
+            background: #ffc107;
+            color: black;
+        }
+
+        .status-desativada {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-outros {
+            background: #6c757d;
+            color: white;
+        }
 
         .cards-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
+
         .card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin: 10px;
-    width: 300px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    border-left: 5px solid transparent;
-    padding-left: 15px;
-}
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            width: 300px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            border-left: 5px solid transparent;
+            padding-left: 15px;
+        }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
-}
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
+        }
 
-.card h2 {
-    margin-top: 0;
-    color: #007BFF;
-}
+        .card h2 {
+            margin-top: 0;
+            color: #007BFF;
+        }
 
-.card p {
-    margin: 10px 0;
-    color: #555;
-}
+        .card p {
+            margin: 10px 0;
+            color: #555;
+        }
 
-.status {
-    font-weight: bold;
-    padding: 5px;
-    border-radius: 4px;
-    text-align: center;
-}
+        .status {
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+        }
 
-/* Ocultar detalhes por padrão */
-.card .detalhes {
-    display: none;
-}
+        /* Ocultar detalhes por padrão */
+        .card .detalhes {
+            display: none;
+        }
 
-/* Botão de expandir/recolher */
-.toggle-btn {
-    background: none;
-    border: none;
-    color: #007BFF;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: underline;
-    margin-top: 10px;
-}
+        /* Botão de expandir/recolher */
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #007BFF;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
 
-.toggle-btn:hover {
-    color: #0056b3;
-}
+        .toggle-btn:hover {
+            color: #0056b3;
+        }
 
-/* Cores da borda lateral */
-.status-em-base .card { border-left-color: #28a745; }
-.status-em-deslocamento .card { border-left-color: #ffc107; }
-.status-em-acao .card { border-left-color: #dc3545; }
-.status-outros .card { border-left-color: #6c757d; }
+        /* Cores da borda lateral */
+        .status-livre .card {
+            border-left-color: #28a745;
+        }
 
+        .status-empenhada .card {
+            border-left-color: #ffc107;
+        }
+
+        .status-desativada .card {
+            border-left-color: #dc3545;
+        }
+
+        .status-outros .card {
+            border-left-color: #6c757d;
+        }
     </style>
 </head>
+
 <body>
     <h1>Equipes Ativas</h1>
 
     <!-- Seções para os status -->
     <div class="status-section">
-        <div class="status-title status-em-base">🟢 Em Base</div>
-        <div id="em-base" class="cards-container"></div>
+        <div class="status-title status-livre">🟢 LIVRE (<span id="qtd-livre">0</span> Equipes)</div>
+        <div id="livre" class="cards-container"></div>
+    </div>    
+
+    <div class="status-section">
+        <div class="status-title status-empenhada">🟡 EMPENHADA (<span id="qtd-empenhada">0</span> Equipes)</div>
+        <div id="empenhada" class="cards-container"></div>
     </div>
 
     <div class="status-section">
-        <div class="status-title status-em-deslocamento">🟡 Em Deslocamento</div>
-        <div id="em-deslocamento" class="cards-container"></div>
+        <div class="status-title status-desativada">🔴 DESATIVADA (<span id="qtd-desativada">0</span> Equipes)</div>
+        <div id="desativada" class="cards-container"></div>
     </div>
 
     <div class="status-section">
-        <div class="status-title status-em-acao">🔴 Em Ação</div>
-        <div id="em-acao" class="cards-container"></div>
-    </div>
-
-    <div class="status-section">
-        <div class="status-title status-outros">⚪ Outros</div>
+        <div class="status-title status-outros">⚪ OUTROS (<span id="qtd-outros">0</span> Equipes)</div>
         <div id="outros" class="cards-container"></div>
     </div>
 
     <script>
-        // Função que será chamada com os dados retornados pelo Google Apps Script
+        // Função para carregar os dados e atualizar os cards
         function carregarDadosJSONP(dados) {
             console.log(dados);
 
+            // Mapeia os status e zera os contadores
+            const statusIds = {
+                "livre": "livre",
+                "empenhada": "empenhada",
+                "desativada": "desativada",
+                "outros": "outros"
+            };
+            let contadores = {
+                "livre": 0,
+                "empenhada": 0,
+                "desativada": 0,
+                "outros": 0
+            };
+
             // Limpa os containers antes de adicionar novos cards
-            document.getElementById("em-base").innerHTML = "";
-            document.getElementById("em-deslocamento").innerHTML = "";
-            document.getElementById("em-acao").innerHTML = "";
-            document.getElementById("outros").innerHTML = "";
+            for (let status in statusIds) {
+                document.getElementById(statusIds[status]).innerHTML = "";
+            }
 
             // Processa os dados e cria os cards
             dados.forEach(equipe => {
+                if (!equipe.chefe) return; // Se não houver chefe, não cria o card
                 let status = equipe.status ? equipe.status.toLowerCase() : "outros";
-                const statusMap = {
-                    "em base": "em-base",
-                    "em deslocamento": "em-deslocamento",
-                    "em ação": "em-acao"
-                };
-                const statusId = statusMap[status] || "outros";
+                const statusId = statusIds[status] || "outros";
 
                 const card = document.createElement("div");
                 card.className = "card";
@@ -154,23 +195,32 @@
                     <h2>${equipe.equipe}</h2>
                     <p><strong>Chefe:</strong> ${equipe.chefe || "N/A"}</p>
                     <p><strong>Motorista:</strong> ${equipe.motorista || "N/A"}</p>
-                    <p><strong>Telefone:</strong> ${equipe.telefone_motorista || "N/A"}</p>
+                    <p><strong>Telefone Mot.:</strong> ${equipe.tel_mot || "N/A"}</p>
                     <p><strong>Bairro:</strong> ${equipe.bairro || "N/A"}</p>
                     <p><strong>Pessoas na Equipe:</strong> ${equipe.pessoas_por_equipe || "N/A"}</p>
                     <button class="toggle-btn" onclick="toggleDetalhes(this)">Ver mais</button>
                     <div class="detalhes">
                 `;
 
-                // Adiciona os outros detalhes ao card (exceto os que já estão visíveis)
+                // Adiciona os detalhes somente se tiverem conteúdo
                 for (const chave in equipe) {
-                    if (!["equipe", "status", "chefe", "motorista", "telefone_motorista", "bairro", "pessoas_por_equipe"].includes(chave)) {
+                    if (!["equipe", "status", "chefe", "motorista", "tel_mot", "bairro", "pessoas_por_equipe"].includes(chave)
+                        && equipe[chave]) {  
                         cardContent += `<p><strong>${formatarChave(chave)}:</strong> ${equipe[chave]}</p>`;
                     }
                 }
 
                 card.innerHTML = cardContent;
                 document.getElementById(statusId).appendChild(card);
+
+                // Atualiza o contador do status
+                contadores[statusId]++;
             });
+
+            // Atualiza os números nos títulos
+            for (let status in contadores) {
+                document.getElementById(`qtd-${status}`).textContent = contadores[status];
+            }
         }
 
         // Função para alternar a exibição dos detalhes
@@ -190,16 +240,15 @@
             return chave.replace(/_/g, " ").replace(/\b\w/g, letra => letra.toUpperCase());
         }
 
-        // Cria uma tag <script> para carregar os dados via JSONP
+        // Carrega os dados do Google Apps Script via JSONP
         function carregarDados() {
             const script = document.createElement("script");
-            script.src = "https://script.google.com/macros/s/AKfycbyJFF-G2SWHiYoY3rjIWHKJ-nxJqlakHKqgJF8INkAH5mpUGnPHVEzQIrQ8ZAIIYebF/exec?callback=carregarDadosJSONP";
+            script.src = "https://script.google.com/macros/s/AKfycbzzUImnPEjo806Wj82p6_FEItFEGCyDxEhFWINjAB63m-XbwoUIcBqMjGhyPFrJulC8/exec?callback=carregarDadosJSONP";
             document.body.appendChild(script);
         }
 
-        // Carrega os dados ao carregar a página e a cada 10 segundos
+        // Carrega os dados ao carregar a página e a cada 30 segundos
         carregarDados();
-        setInterval(carregarDados, 10000);
+        setInterval(carregarDados, 30000);
     </script>
 </body>
-</html>
