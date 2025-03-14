@@ -75,6 +75,7 @@
         .card h2 {
             margin-top: 0;
             color: #007BFF;
+            display: inline-block;
         }
 
         .card p {
@@ -89,12 +90,10 @@
             text-align: center;
         }
 
-        /* Ocultar detalhes por padrão */
-        .card .detalhes {
+        .detalhes {
             display: none;
         }
 
-        /* Botão de expandir/recolher */
         .toggle-btn {
             background: none;
             border: none;
@@ -109,7 +108,6 @@
             color: #0056b3;
         }
 
-        /* Cores da borda lateral */
         .status-livre .card {
             border-left-color: #28a745;
         }
@@ -121,24 +119,39 @@
         .status-pausa-operacional .card {
             border-left-color: #6c757d;
         }
+
+        /* Estilo para o cronômetro */
+        .cronometro {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: red;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .card {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
     </style>
 </head>
 
 <body>
     <h1>Equipes Ativas</h1>
 
-    <!-- Seções para os status -->
     <div class="status-section">
         <div class="status-title status-livre">🟢 LIVRE (<span id="qtd-livre">0</span> Equipes)</div>
         <div id="livre" class="cards-container"></div>
-    </div>    
+    </div>
 
     <div class="status-section">
         <div class="status-title status-empenhada">🟡 EMPENHADA (<span id="qtd-empenhada">0</span> Equipes)</div>
         <div id="empenhada" class="cards-container"></div>
     </div>
-
-    <!-- Removido a seção "DESATIVADA" -->
 
     <div class="status-section">
         <div class="status-title status-pausa-operacional">⚪ PAUSA OPERACIONAL (<span id="qtd-pausa-operacional">0</span> Equipes)</div>
@@ -146,11 +159,29 @@
     </div>
 
     <script>
+        // Função para calcular o cronômetro em tempo real
+        function iniciarCronometro(cronometroElement, tempoInicial) {
+            // Função para atualizar o cronômetro
+            function atualizarCronometro() {
+                const tempoAtual = new Date();
+                const tempoDecorrido = Math.floor((tempoAtual - tempoInicial) / 1000); // Em segundos
+
+                const horas = Math.floor(tempoDecorrido / 3600);
+                const minutos = Math.floor((tempoDecorrido % 3600) / 60);
+                const segundos = tempoDecorrido % 60;
+
+                // Atualiza o cronômetro no formato HH:MM:SS
+                cronometroElement.textContent = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            }
+
+            // Atualiza o cronômetro a cada segundo
+            setInterval(atualizarCronometro, 1000);
+        }
+
         // Função para carregar os dados e atualizar os cards
         function carregarDadosJSONP(dados) {
             console.log(dados);
 
-            // Mapeia os status e zera os contadores
             const statusIds = {
                 "livre": "livre",
                 "empenhada": "empenhada",
@@ -162,22 +193,21 @@
                 "pausa-operacional": 0
             };
 
-            // Limpa os containers antes de adicionar novos cards
             for (let status in statusIds) {
                 document.getElementById(statusIds[status]).innerHTML = "";
             }
 
-            // Processa os dados e cria os cards
             dados.forEach(equipe => {
-                if (!equipe.chefe) return; // Se não houver chefe, não cria o card
+                if (!equipe.chefe) return;
+
                 let status = equipe.status ? equipe.status.toLowerCase() : "outros";
-                if (status === "outros") status = "pausa-operacional";  // Altere "outros" para "pausa-operacional"
+                if (status === "outros") status = "pausa-operacional";  
                 const statusId = statusIds[status] || "pausa-operacional";
 
                 const card = document.createElement("div");
                 card.className = "card";
 
-                // Campos sempre visíveis
+                // Montando o conteúdo do card
                 let cardContent = `
                     <h2>${equipe.equipe}</h2>
                     <p><strong>Chefe:</strong> ${equipe.chefe || "N/A"}</p>
@@ -185,14 +215,23 @@
                     <p><strong>Telefone Mot.:</strong> ${equipe.tel_mot || "N/A"}</p>
                     <p><strong>Bairro:</strong> ${equipe.bairro || "N/A"}</p>
                     <p><strong>Pessoas na Equipe:</strong> ${equipe.pessoas_por_equipe || "N/A"}</p>
-                    <button class="toggle-btn" onclick="toggleDetalhes(this)">Ver mais</button>
+                `;
+
+                // Se o status for "LIVRE" ou "PAUSA OPERACIONAL", mostra o cronômetro no card
+                if (status === "livre" || status === "pausa-operacional") {
+                    cardContent += `<div class="cronometro" id="cronometro-${equipe.equipe}">00:00:00</div>`;
+                    const tempoInicial = new Date(equipe.cronometro);  // Hora de início do cronômetro
+                    setTimeout(() => iniciarCronometro(document.getElementById(`cronometro-${equipe.equipe}`), tempoInicial), 0);
+                }
+
+                cardContent += `
+                    <button class="toggle-btn" onclick="toggleDetalhes(this)" aria-expanded="false">Ver mais</button>
                     <div class="detalhes">
                 `;
 
-                // Adiciona os detalhes somente se tiverem conteúdo
+                // Adicionando os detalhes do card
                 for (const chave in equipe) {
-                    if (!["equipe", "status", "chefe", "motorista", "tel_mot", "bairro", "pessoas_por_equipe"].includes(chave)
-                        && equipe[chave]) {  
+                    if (!["equipe", "status", "chefe", "motorista", "tel_mot", "bairro", "pessoas_por_equipe", "cronometro"].includes(chave) && equipe[chave]) {  
                         cardContent += `<p><strong>${formatarChave(chave)}:</strong> ${equipe[chave]}</p>`;
                     }
                 }
@@ -200,7 +239,7 @@
                 card.innerHTML = cardContent;
                 document.getElementById(statusId).appendChild(card);
 
-                // Atualiza o contador do status
+                // Atualizando o contador de equipes
                 contadores[statusId]++;
             });
 
@@ -210,33 +249,35 @@
             }
         }
 
-        // Função para alternar a exibição dos detalhes
+        // Função para formatar as chaves (nomes dos campos) das equipes
+        function formatarChave(chave) {
+            return chave.replace(/_/g, " ").replace(/\b\w/g, letra => letra.toUpperCase());
+        }
+
+        // Função para mostrar/ocultar os detalhes do card
         function toggleDetalhes(botao) {
             let detalhes = botao.nextElementSibling;
             if (detalhes.style.display === "none" || detalhes.style.display === "") {
                 detalhes.style.display = "block";
                 botao.textContent = "Ver menos";
+                botao.setAttribute("aria-expanded", "true");
             } else {
                 detalhes.style.display = "none";
                 botao.textContent = "Ver mais";
+                botao.setAttribute("aria-expanded", "false");
             }
         }
 
-        // Formata as chaves para exibição
-        function formatarChave(chave) {
-            return chave.replace(/_/g, " ").replace(/\b\w/g, letra => letra.toUpperCase());
-        }
-
-        // Carrega os dados do Google Apps Script via JSONP
+        // Função para carregar dados via JSONP
         function carregarDados() {
             const script = document.createElement("script");
             script.src = "https://script.google.com/macros/s/AKfycbxq7J8dlkwC1miKnNw7WEtj9gnSOQHQWybdzFygxbAD7Bu4wP7qJ27-gYGcStI-L9eX/exec?callback=carregarDadosJSONP";
             document.body.appendChild(script);
         }
 
-        // Carrega os dados ao carregar a página e a cada 30 segundos
         carregarDados();
         setInterval(carregarDados, 30000);
     </script>
 </body>
+
 </html>
