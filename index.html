@@ -198,9 +198,13 @@
             }
 
             dados.forEach(equipe => {
-                if (!equipe.chefe) return;
+                if (!equipe.chefe) return; 
 
+                // Verificando se o status é "LIVRE", "EMPRENHADA" ou "OUTROS"
+                const statusValido = ["livre", "empenhada", "outros"];
                 let status = equipe.status ? equipe.status.toLowerCase() : "outros";
+                if (!statusValido.includes(status)) return; // Se não for um dos status válidos, pula o card
+
                 if (status === "outros") status = "pausa-operacional";  
                 const statusId = statusIds[status] || "pausa-operacional";
 
