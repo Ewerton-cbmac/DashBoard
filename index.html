@@ -42,12 +42,7 @@
             color: black;
         }
 
-        .status-desativada {
-            background: #dc3545;
-            color: white;
-        }
-
-        .status-outros {
+        .status-pausa-operacional {
             background: #6c757d;
             color: white;
         }
@@ -123,11 +118,7 @@
             border-left-color: #ffc107;
         }
 
-        .status-desativada .card {
-            border-left-color: #dc3545;
-        }
-
-        .status-outros .card {
+        .status-pausa-operacional .card {
             border-left-color: #6c757d;
         }
     </style>
@@ -147,14 +138,11 @@
         <div id="empenhada" class="cards-container"></div>
     </div>
 
-    <div class="status-section">
-        <div class="status-title status-desativada">🔴 DESATIVADA (<span id="qtd-desativada">0</span> Equipes)</div>
-        <div id="desativada" class="cards-container"></div>
-    </div>
+    <!-- Removido a seção "DESATIVADA" -->
 
     <div class="status-section">
-        <div class="status-title status-outros">⚪ OUTROS (<span id="qtd-outros">0</span> Equipes)</div>
-        <div id="outros" class="cards-container"></div>
+        <div class="status-title status-pausa-operacional">⚪ PAUSA OPERACIONAL (<span id="qtd-pausa-operacional">0</span> Equipes)</div>
+        <div id="pausa-operacional" class="cards-container"></div>
     </div>
 
     <script>
@@ -166,14 +154,12 @@
             const statusIds = {
                 "livre": "livre",
                 "empenhada": "empenhada",
-                "desativada": "desativada",
-                "outros": "outros"
+                "pausa-operacional": "pausa-operacional"
             };
             let contadores = {
                 "livre": 0,
                 "empenhada": 0,
-                "desativada": 0,
-                "outros": 0
+                "pausa-operacional": 0
             };
 
             // Limpa os containers antes de adicionar novos cards
@@ -185,7 +171,8 @@
             dados.forEach(equipe => {
                 if (!equipe.chefe) return; // Se não houver chefe, não cria o card
                 let status = equipe.status ? equipe.status.toLowerCase() : "outros";
-                const statusId = statusIds[status] || "outros";
+                if (status === "outros") status = "pausa-operacional";  // Altere "outros" para "pausa-operacional"
+                const statusId = statusIds[status] || "pausa-operacional";
 
                 const card = document.createElement("div");
                 card.className = "card";
@@ -252,3 +239,4 @@
         setInterval(carregarDados, 30000);
     </script>
 </body>
+</html>
